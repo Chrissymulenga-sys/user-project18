@@ -1,0 +1,38 @@
+#!/bin/bash
+file="/etc/passwd"
+user=$(whoami)
+usage() {
+echo "usage: userhome [ -f file ] [username]"
+echo " -f file file to the search (default: /etc/passwd)"
+echo " username user to find (default: current user)"
+echo " --help show this help"
+}
+if [ "$1" = "--help" ] || [ "$1" = "--usage" ]; then
+usage 
+exit 0
+fi 
+if [ "$1" = "-f" ]; then 
+   if [ -z "$2" ]; then 
+      usage >&2
+      exit 3
+   fi 
+   file="$2"
+   shift
+   shift
+fi
+if [ -n "$1" ]; then 
+   user="$1"
+fi 
+if [ ! -f "$file" ]; then
+ echo " Error: file $file not found" >&2
+ exit 2 
+fi 
+
+line=$(grep "^$user:" "$file")
+if [ -z "$line" ]; then 
+   echo "Error: user $user not found" >&2
+   exit 1
+fi 
+echo "$line" | cut -d: -f6 
+exit 0
+
